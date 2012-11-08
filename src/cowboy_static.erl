@@ -211,7 +211,7 @@ init({_Transport, http}, _Req, _Opts) ->
 
 
 %% @private Set up initial state of REST handler.
--spec rest_init(Req, list()) -> {ok, Req, #state{}} when Req::cowboy_req:req().
+-spec rest_init(Req, list()) -> {ok, Req, #state{}}.
 rest_init(Req, Opts) ->
 	Directory = proplists:get_value(directory, Opts),
 	Directory1 = directory_path(Directory),
@@ -247,13 +247,13 @@ rest_init(Req, Opts) ->
 
 %% @private Only allow GET and HEAD requests on files.
 -spec allowed_methods(Req, #state{})
-	-> {[binary()], Req, #state{}} when Req::cowboy_req:req().
+	-> {[binary()], Req, #state{}}.
 allowed_methods(Req, State) ->
 	{[<<"GET">>, <<"HEAD">>], Req, State}.
 
 %% @private
 -spec malformed_request(Req, #state{})
-	-> {boolean(), Req, #state{}} when Req::cowboy_req:req().
+	-> {boolean(), Req, #state{}}.
 malformed_request(Req, #state{filepath=error}=State) ->
 	{true, Req, State};
 malformed_request(Req, State) ->
@@ -262,7 +262,7 @@ malformed_request(Req, State) ->
 
 %% @private Check if the resource exists under the document root.
 -spec resource_exists(Req, #state{})
-	-> {boolean(), Req, #state{}} when Req::cowboy_req:req().
+	-> {boolean(), Req, #state{}}.
 resource_exists(Req, #state{fileinfo={error, _}}=State) ->
 	{false, Req, State};
 resource_exists(Req, #state{fileinfo={ok, Fileinfo}}=State) ->
@@ -273,7 +273,7 @@ resource_exists(Req, #state{fileinfo={ok, Fileinfo}}=State) ->
 %% Access to a file resource is forbidden if it exists and the local node does
 %% not have permission to read it. Directory listings are always forbidden.
 -spec forbidden(Req, #state{})
-	-> {boolean(), Req, #state{}} when Req::cowboy_req:req().
+	-> {boolean(), Req, #state{}}.
 forbidden(Req, #state{fileinfo={_, #file_info{type=directory}}}=State) ->
 	{true, Req, State};
 forbidden(Req, #state{fileinfo={error, eacces}}=State) ->
@@ -286,7 +286,7 @@ forbidden(Req, #state{fileinfo={ok, #file_info{access=Access}}}=State) ->
 
 %% @private Read the time a file system system object was last modified.
 -spec last_modified(Req, #state{})
-	-> {calendar:datetime(), Req, #state{}} when Req::cowboy_req:req().
+	-> {calendar:datetime(), Req, #state{}}.
 last_modified(Req, #state{fileinfo={ok, #file_info{mtime=Modified}}}=State) ->
 	{Modified, Req, State}.
 
@@ -295,7 +295,7 @@ last_modified(Req, #state{fileinfo={ok, #file_info{mtime=Modified}}}=State) ->
 %% The ETag header value is only generated if the resource is a file that
 %% exists in document root.
 -spec generate_etag(Req, #state{})
-	-> {undefined | binary(), Req, #state{}} when Req::cowboy_req:req().
+	-> {undefined | binary(), Req, #state{}}.
 generate_etag(Req, #state{fileinfo={_, #file_info{type=regular, inode=INode,
 		mtime=Modified, size=Filesize}}, filepath=Filepath,
 		etag_fun={ETagFun, ETagData}}=State) ->
@@ -472,7 +472,7 @@ no_etag_function(_Args, undefined) ->
 attr_etag_function(Args, Attrs) ->
 	[[_|H]|T] = [begin
 		{_,Pair} = {_,{_,_}} = {Attr,lists:keyfind(Attr, 1, Args)},
-		[$-|integer_to_list(erlang:phash2(Pair, 1 bsl 32), 16)]
+		[$-|erlang:integer_to_list(erlang:phash2(Pair, 1 bsl 32), 16)]
 	end || Attr <- Attrs],
 	{strong, list_to_binary([H|T])}.
 

@@ -48,34 +48,44 @@
 %% <em>hibernate</em>. Doing so helps save memory and improve CPU usage.
 -module(cowboy_websocket_handler).
 
--type opts() :: any().
--type state() :: any().
--type terminate_reason() :: {normal, closed}
-	| {normal, timeout}
-	| {error, closed}
-	| {error, badframe}
-	| {error, atom()}.
+-export([behaviour_info/1]).
 
--callback websocket_init(atom(), Req, opts())
-	-> {ok, Req, state()}
-	| {ok, Req, state(), hibernate}
-	| {ok, Req, state(), timeout()}
-	| {ok, Req, state(), timeout(), hibernate}
-	| {shutdown, Req}
-	when Req::cowboy_req:req().
--callback websocket_handle({text | binary | ping | pong, binary()}, Req, State)
-	-> {ok, Req, State}
-	| {ok, Req, State, hibernate}
-	| {reply, {text | binary | ping | pong, binary()}, Req, State}
-	| {reply, {text | binary | ping | pong, binary()}, Req, State, hibernate}
-	| {shutdown, Req, State}
-	when Req::cowboy_req:req(), State::state().
--callback websocket_info(any(), Req, State)
-	-> {ok, Req, State}
-	| {ok, Req, State, hibernate}
-	| {reply, {text | binary | ping | pong, binary()}, Req, State}
-	| {reply, {text | binary | ping | pong, binary()}, Req, State, hibernate}
-	| {shutdown, Req, State}
-	when Req::cowboy_req:req(), State::state().
--callback websocket_terminate(terminate_reason(), cowboy_req:req(), state())
-	-> ok.
+
+% -type opts() :: any().
+% -type state() :: any().
+% -type terminate_reason() :: {normal, closed}
+% 	| {normal, timeout}
+% 	| {error, closed}
+% 	| {error, badframe}
+% 	| {error, atom()}.
+
+behaviour_info(callbacks) ->
+[
+{websocket_init,3},
+% -callback websocket_init(atom(), Req, opts())
+% 	-> {ok, Req, state()}
+% 	| {ok, Req, state(), hibernate}
+% 	| {ok, Req, state(), timeout()}
+% 	| {ok, Req, state(), timeout(), hibernate}
+% 	| {shutdown, Req}
+% 	when Req::cowboy_req:req().
+{websocket_handle, 2},
+% -callback websocket_handle({text | binary | ping | pong, binary()}, Req, State)
+% 	-> {ok, Req, State}
+% 	| {ok, Req, State, hibernate}
+% 	| {reply, {text | binary | ping | pong, binary()}, Req, State}
+% 	| {reply, {text | binary | ping | pong, binary()}, Req, State, hibernate}
+% 	| {shutdown, Req, State}
+% 	when Req::cowboy_req:req(), State::state().
+{websocket_info, 3},
+% -callback websocket_info(any(), Req, State)
+% 	-> {ok, Req, State}
+% 	| {ok, Req, State, hibernate}
+% 	| {reply, {text | binary | ping | pong, binary()}, Req, State}
+% 	| {reply, {text | binary | ping | pong, binary()}, Req, State, hibernate}
+% 	| {shutdown, Req, State}
+% 	when Req::cowboy_req:req(), State::state().
+{websocket_terminate, 3}
+% -callback websocket_terminate(terminate_reason(), cowboy_req:req(), state())
+% 	-> ok.
+].

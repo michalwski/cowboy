@@ -31,18 +31,26 @@
 %% about the request.
 -module(cowboy_http_handler).
 
--type opts() :: any().
--type state() :: any().
+-export([behaviour_info/1]).
 
--callback init({atom(), http}, Req, opts())
-	-> {ok, Req, state()}
-	| {loop, Req, state()}
-	| {loop, Req, state(), hibernate}
-	| {loop, Req, state(), timeout()}
-	| {loop, Req, state(), timeout(), hibernate}
-	| {shutdown, Req, state()}
-	| {upgrade, protocol, module()}
-	when Req::cowboy_req:req().
--callback handle(Req, State) -> {ok, Req, State}
-	when Req::cowboy_req:req(), State::state().
--callback terminate(cowboy_req:req(), state()) -> ok.
+% -type opts() :: any().
+% -type state() :: any().
+
+behaviour_info(callbacks) ->
+[
+{init, 2},
+% -callback init({atom(), http}, Req, opts())
+% 	-> {ok, Req, state()}
+% 	| {loop, Req, state()}
+% 	| {loop, Req, state(), hibernate}
+% 	| {loop, Req, state(), timeout()}
+% 	| {loop, Req, state(), timeout(), hibernate}
+% 	| {shutdown, Req, state()}
+% 	| {upgrade, protocol, module()}
+% 	when Req::cowboy_req:req().
+{handle, 2},
+% -callback handle(Req, State) -> {ok, Req, State}
+% 	when Req::cowboy_req:req(), State::state().
+{terminate,2}
+% -callback terminate(cowboy_req:req(), state()) -> ok.
+].

@@ -110,7 +110,7 @@ parse_boundary_eol(Bin, Pattern) ->
 			cowboy_http:whitespace(Rest, Fun);
 		nomatch ->
 			% CRLF not found in the given binary.
-			RestStart = max(byte_size(Bin) - 1, 0),
+			RestStart = erlang:max(byte_size(Bin) - 1, 0),
 			<<_:RestStart/binary, Rest/binary>> = Bin,
 			more(Rest, fun (NewBin) -> parse_boundary_eol(NewBin, Pattern) end)
 	end.
@@ -184,7 +184,7 @@ skip(Bin, Pattern = {P, PSize}) ->
 			parse_boundary_tail(Rest, Pattern);
 		nomatch ->
 			% Boundary not found, need more data.
-			RestStart = max(byte_size(Bin) - PSize + 1, 0),
+			RestStart = erlang:max(byte_size(Bin) - PSize + 1, 0),
 			<<_:RestStart/binary, Rest/binary>> = Bin,
 			more(Rest, fun (NewBin) -> skip(NewBin, Pattern) end)
 	end.

@@ -65,7 +65,7 @@ upgrade(ListenerPid, Handler, Opts, Req) ->
 	end.
 
 -spec websocket_upgrade(#state{}, Req)
-	-> {ok, #state{}, Req} when Req::cowboy_req:req().
+	-> {ok, #state{}, Req}.
 websocket_upgrade(State, Req) ->
 	{ok, ConnTokens, Req2}
 		= cowboy_req:parse_header(<<"connection">>, Req),
@@ -79,7 +79,7 @@ websocket_upgrade(State, Req) ->
 %% @todo Handle the Sec-Websocket-Protocol header.
 %% @todo Reply a proper error, don't die, if a required header is undefined.
 -spec websocket_upgrade(undefined | <<_:8>>, #state{}, Req)
-	-> {ok, #state{}, Req} when Req::cowboy_req:req().
+	-> {ok, #state{}, Req}.
 %% No version given. Assuming hixie-76 draft.
 %%
 %% We need to wait to send a reply back before trying to read the

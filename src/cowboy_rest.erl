@@ -55,7 +55,7 @@
 %% protocol, you simply need to return <em>{upgrade, protocol, {@module}}</em>
 %% in your <em>cowboy_http_handler:init/3</em> handler function.
 -spec upgrade(pid(), module(), any(), Req)
-	-> {ok, Req} | close when Req::cowboy_req:req().
+	-> {ok, Req} | close.
 upgrade(_ListenerPid, Handler, Opts, Req) ->
 	try
 		Method = cowboy_req:get(method, Req),

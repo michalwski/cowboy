@@ -50,12 +50,12 @@
 -export([x_www_form_urlencoded/1]).
 
 -type version() :: {Major::non_neg_integer(), Minor::non_neg_integer()}.
--type headers() :: [{binary(), iodata()}].
--type status() :: non_neg_integer() | binary().
+% -type headers() :: [{binary(), iodata()}].
+% type status() :: non_neg_integer() | binary().
 
 -export_type([version/0]).
--export_type([headers/0]).
--export_type([status/0]).
+% -export_type([headers/0]).
+% -export_type([status/0]).
 
 -ifdef(TEST).
 -include_lib("eunit/include/eunit.hrl").
@@ -741,7 +741,7 @@ te_chunked(Data, {0, Streamed}) ->
 		fun (Rest, _) when byte_size(Rest) < 4 ->
 				more;
 			(<< "\r\n", Rest/binary >>, BinLen) ->
-				Len = list_to_integer(binary_to_list(BinLen), 16),
+				Len = erlang:list_to_integer(binary_to_list(BinLen), 16),
 				te_chunked(Rest, {Len, Streamed});
 			(_, _) ->
 				{error, badarg}
