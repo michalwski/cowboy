@@ -115,7 +115,7 @@ parse_url(URL) ->
 	parse_url(URL, ranch_tcp).
 
 parse_url(URL, Transport) ->
-	case binary:split(URL, <<"/">>) of
+	case re:split(URL, <<"/">>, [{parts,2}]) of
 		[Peer] ->
 			{Host, Port} = parse_peer(Peer, Transport),
 			{Transport, Peer, Host, Port, <<"/">>};
@@ -125,7 +125,7 @@ parse_url(URL, Transport) ->
 	end.
 
 parse_peer(Peer, Transport) ->
-	case binary:split(Peer, <<":">>) of
+	case re:split(Peer, <<":">>) of
 		[Host] when Transport =:= ranch_tcp ->
 			{binary_to_list(Host), 80};
 		[Host] when Transport =:= ranch_ssl ->
@@ -171,7 +171,7 @@ skip_body(Client=#client{state=response_body}) ->
 
 stream_status(Client=#client{state=State, buffer=Buffer})
 		when State =:= request ->
-	case binary:split(Buffer, <<"\r\n">>) of
+	case re:split(Buffer, <<"\r\n">>, [{parts, 2}]) of
 		[Line, Rest] ->
 			parse_status(Client#client{state=response, buffer=Rest}, Line);
 		_ ->
@@ -208,7 +208,7 @@ stream_headers(Client, Acc) ->
 
 stream_header(Client=#client{state=State, buffer=Buffer,
 		response_body=RespBody}) when State =:= response ->
-	case binary:split(Buffer, <<"\r\n">>) of
+	case re:split(Buffer, <<"\r\n">>, [{parts, 2}]) of
 		[<<>>, Rest] ->
 			%% If we have a body, set response_body.
 			Client2 = case RespBody of
@@ -219,7 +219,7 @@ stream_header(Client=#client{state=State, buffer=Buffer,
 			{done, Client2#client{buffer=Rest}};
 		[Line, Rest] ->
 			%% @todo Do a better parsing later on.
-			[Name, Value] = binary:split(Line, <<": ">>),
+			[Name, Value] = re:split(Line, <<": ">>, [{parts, 2}]),
 			Name2 = cowboy_bstr:to_lower(Name),
 			Client2 = case Name2 of
 				<<"content-length">> ->

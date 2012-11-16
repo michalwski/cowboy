@@ -865,8 +865,8 @@ tohexl(C) when C < 17 -> $a + C - 10.
 x_www_form_urlencoded(<<>>) ->
 	[];
 x_www_form_urlencoded(Qs) ->
-	Tokens = binary:split(Qs, <<"&">>, [global, trim]),
-	[case binary:split(Token, <<"=">>) of
+	Tokens = re:split(Qs, <<"&">>, [trim]),
+	[case re:split(Token, <<"=">>, [{parts, 2}]) of
 		[Token] -> {urldecode(Token), true};
 		[Name, Value] -> {urldecode(Name), urldecode(Value)}
 	end || Token <- Tokens].

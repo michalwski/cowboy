@@ -91,7 +91,7 @@ websocket_upgrade(undefined, State, Req) ->
 	{Key1, Req3} = cowboy_req:header(<<"sec-websocket-key1">>, Req2),
 	{Key2, Req4} = cowboy_req:header(<<"sec-websocket-key2">>, Req3),
 	false = lists:member(undefined, [Origin, Key1, Key2]),
-	EOP = binary:compile_pattern(<< 255 >>),
+	{ok, EOP} = re:compile(<< 255 >>),
 	{ok, State#state{version=0, origin=Origin, challenge={Key1, Key2},
 		eop=EOP}, cowboy_req:set_meta(websocket_version, 0, Req4)};
 %% Versions 7 and 8. Implementation follows the hybi 7 through 17 drafts.
@@ -242,8 +242,8 @@ websocket_data(State=#state{version=0}, Req, HandlerState,
 %% hixie-76 data frame. We only support the frame type 0, same as the specs.
 websocket_data(State=#state{version=0, eop=EOP}, Req, HandlerState,
 		Data = << 0, _/binary >>) ->
-	case binary:match(Data, EOP) of
-		{Pos, 1} ->
+	case re:run(Data, EOP) of
+		{match, [{Pos, 1}]} ->
 			Pos2 = Pos - 1,
 			<< 0, Payload:Pos2/binary, 255, Rest/bits >> = Data,
 			handler_call(State, Req, HandlerState,

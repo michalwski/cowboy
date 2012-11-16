@@ -111,7 +111,7 @@ rfc2109(LocalTime) ->
 %% @private
 init([]) ->
 	?TABLE = ets:new(?TABLE, [set, protected,
-		named_table, {read_concurrency, true}]),
+		named_table]),
 	T = erlang:universaltime(),
 	B = update_rfc1123(<<>>, undefined, T),
 	{ok, TRef} = timer:send_interval(1000, update),

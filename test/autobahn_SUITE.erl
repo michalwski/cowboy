@@ -92,7 +92,7 @@ run_tests(Config) ->
 		_ -> ok
 	end,
 	{ok, IndexHTML} = file:read_file(IndexFile),
-	case binary:match(IndexHTML, <<"Fail">>) of
-		{_, _} -> erlang:error(failed);
+	case re:run(IndexHTML, <<"Fail">>) of
+		{match, [{_, _}]} -> erlang:error(failed);
 		nomatch -> ok
 	end.

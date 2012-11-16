@@ -73,14 +73,15 @@ parse(Bin, Boundary) ->
 	% Not enough data to know if the data begins with a boundary.
 	more(Bin, fun (NewBin) -> parse(NewBin, Boundary) end).
 
--type pattern() :: {binary:cp(), non_neg_integer()}.
+-type pattern() :: {re:mp(), non_neg_integer()}.
 
 %% @doc Return a compiled binary pattern with its size in bytes.
 %% The pattern is the boundary prepended with "\r\n--".
 -spec pattern(binary()) -> pattern().
 pattern(Boundary) ->
 	MatchPattern = <<"\r\n--", Boundary/binary>>,
-	{binary:compile_pattern(MatchPattern), byte_size(MatchPattern)}.
+	{ok, MP} = re:compile(MatchPattern),
+	{MP, byte_size(MatchPattern)}.
 
 %% @doc Parse remaining characters of a line beginning with the boundary.
 %% If followed by "--", <em>eof</em> is returned and parsing is finished.
@@ -102,8 +103,8 @@ parse_boundary_tail(Bin, Pattern) ->
 %% @doc Skip whitespace and unknown chars until CRLF.
 -spec parse_boundary_eol(binary(), pattern()) -> more(part_result()).
 parse_boundary_eol(Bin, Pattern) ->
-	case binary:match(Bin, <<"\r\n">>) of
-		{CrlfStart, _Length} ->
+	case re:run(Bin, <<"\r\n">>) of
+		{match, [{CrlfStart, _Length}]} ->
 			% End of line found, remove optional whitespace.
 			<<_:CrlfStart/binary, Rest/binary>> = Bin,
 			Fun = fun (Rest2) -> parse_boundary_crlf(Rest2, Pattern) end,
@@ -152,11 +153,11 @@ parse_headers(Bin, Pattern, Acc) ->
 
 -spec parse_body(binary(), pattern()) -> more(body_result()).
 parse_body(Bin, Pattern = {P, PSize}) when byte_size(Bin) >= PSize ->
-	case binary:match(Bin, P) of
-		{0, _Length} ->
+	case re:run(Bin, P) of
+		{match,[{0, _Length}]} ->
 			<<_:PSize/binary, Rest/binary>> = Bin,
 			end_of_part(Rest, Pattern);
-		{BoundaryStart, _Length} ->
+		{match, [{BoundaryStart, _Length}]} ->
 			% Boundary found, this is the latest partial body that will be
 			% returned for this part.
 			<<PBody:BoundaryStart/binary, _:PSize/binary, Rest/binary>> = Bin,
@@ -176,8 +177,8 @@ end_of_part(Bin, Pattern) ->
 
 -spec skip(binary(), pattern()) -> more(part_result()).
 skip(Bin, Pattern = {P, PSize}) ->
-	case binary:match(Bin, P) of
-		{BoundaryStart, _Length} ->
+	case re:run(Bin, P) of
+		{match, [{BoundaryStart, _Length}]} ->
 			% Boundary found, proceed with parsing of the next part.
 			RestStart = BoundaryStart + PSize,
 			<<_:RestStart/binary, Rest/binary>> = Bin,

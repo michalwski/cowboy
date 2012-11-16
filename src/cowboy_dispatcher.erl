@@ -117,12 +117,12 @@ split_host(Host) ->
 	split_host(Host, []).
 
 split_host(Host, Acc) ->
-	case binary:match(Host, <<".">>) of
+	case re:run(Host, <<"\\.">>) of
 		nomatch when Host =:= <<>> ->
 			Acc;
 		nomatch ->
 			[Host|Acc];
-		{Pos, _} ->
+		{match, [{Pos, _}]} ->
 			<< Segment:Pos/binary, _:8, Rest/bits >> = Host,
 			false = byte_size(Segment) == 0,
 			split_host(Rest, [Segment|Acc])
@@ -138,12 +138,12 @@ split_path(<< $/, Path/bits >>) ->
 	split_path(Path, []).
 
 split_path(Path, Acc) ->
-	case binary:match(Path, <<"/">>) of
+	case re:run(Path, <<"/">>) of
 		nomatch when Path =:= <<>> ->
 			lists:reverse([cowboy_http:urldecode(S) || S <- Acc]);
 		nomatch ->
 			lists:reverse([cowboy_http:urldecode(S) || S <- [Path|Acc]]);
-		{Pos, _} ->
+		{match, [{Pos, _}]} ->
 			<< Segment:Pos/binary, _:8, Rest/bits >> = Path,
 			split_path(Rest, [Segment|Acc])
 	end.

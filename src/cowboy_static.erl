@@ -402,8 +402,8 @@ check_path([<<"">>|_T]) -> error;
 check_path([<<".">>|_T]) -> error;
 check_path([<<"..">>|_T]) -> error;
 check_path([H|T]) ->
-	case binary:match(H, <<"/">>) of
-		{_, _} -> error;
+	case re:run(H, <<"/">>) of
+		{match, [{_, _}]} -> error;
 		nomatch -> check_path(T)
 	end.
 

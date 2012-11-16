@@ -377,7 +377,7 @@ local_time_test() ->
 		<<" Expires=", _R/binary>>,
 		<<" Max-Age=111">>,
 		<<" Secure">>],
-	binary:split(B, <<";">>, [global])),
+	re:split(B, <<";">>, [global])),
 	ok.
 
 -spec cookie_test() -> no_return(). %% Not actually true, just a bad option.
