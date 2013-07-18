@@ -1,4 +1,4 @@
-%% Copyright (c) 2011-2012, Loïc Hoguin <essen@ninenines.eu>
+%% Copyright (c) 2011-2013, Loïc Hoguin <essen@ninenines.eu>
 %%
 %% Permission to use, copy, modify, and/or distribute this software for any
 %% purpose with or without fee is hereby granted, provided that the above
@@ -22,8 +22,8 @@
 %% <em>handle/2</em> allows you to handle the request. It receives the
 %% state previously defined.
 %%
-%% <em>terminate/2</em> allows you to clean up. It receives the state
-%% previously defined.
+%% <em>terminate/3</em> allows you to clean up. It receives the
+%% termination reason and the state previously defined.
 %%
 %% There is no required operation to perform in any of these callbacks
 %% other than returning the proper values. Make sure you always return
@@ -33,12 +33,20 @@
 
 -export([behaviour_info/1]).
 
+%% -type opts() :: any().
+%% -type state() :: any().
+%% -type terminate_reason() :: {normal, shutdown}
+%%  | {normal, timeout} %% Only occurs in loop handlers.
+%%	| {error, closed} %% Only occurs in loop handlers.
+%%	| {error, overflow} %% Only occurs in loop handlers.
+%%	| {error, atom()}.
+
 % -type opts() :: any().
 % -type state() :: any().
 
 behaviour_info(callbacks) ->
 [
-{init, 2},
+{init, 3},
 % -callback init({atom(), http}, Req, opts())
 % 	-> {ok, Req, state()}
 % 	| {loop, Req, state()}
@@ -51,6 +59,6 @@ behaviour_info(callbacks) ->
 {handle, 2},
 % -callback handle(Req, State) -> {ok, Req, State}
 % 	when Req::cowboy_req:req(), State::state().
-{terminate,2}
-% -callback terminate(cowboy_req:req(), state()) -> ok.
+{terminate,3}
+% -callback terminate(terminate_reason(), cowboy_req:req(), state()) -> ok.
 ].

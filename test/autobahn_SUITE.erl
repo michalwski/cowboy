@@ -64,7 +64,7 @@ end_per_suite(_Config) ->
 init_per_group(autobahn, Config) ->
 	Port = 33080,
 	cowboy:start_http(autobahn, 100, [{port, Port}], [
-		{dispatch, init_dispatch()}
+		{env, [{dispatch, init_dispatch()}]}
 	]),
 	[{port, Port}|Config].
 
@@ -75,8 +75,8 @@ end_per_group(Listener, _Config) ->
 %% Dispatch configuration.
 
 init_dispatch() ->
-	[{[<<"localhost">>], [
-		{[<<"echo">>], websocket_echo_handler, []}]}].
+	cowboy_router:compile([{"localhost", [
+		{"/echo", autobahn_echo, []}]}]).
 
 %% autobahn cases
 
@@ -92,7 +92,7 @@ run_tests(Config) ->
 		_ -> ok
 	end,
 	{ok, IndexHTML} = file:read_file(IndexFile),
-	case re:run(IndexHTML, <<"Fail">>) of
-		{match, [{_, _}]} -> erlang:error(failed);
-		nomatch -> ok
+	case re:run(IndexHTML, <<"case_failed">>, [global]) of
+		{match, [_, _,_|_]} -> erlang:error(failed);
+		_ -> ok
 	end.

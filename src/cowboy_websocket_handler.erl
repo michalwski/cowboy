@@ -1,4 +1,4 @@
-%% Copyright (c) 2011-2012, Loïc Hoguin <essen@ninenines.eu>
+%% Copyright (c) 2011-2013, Loïc Hoguin <essen@ninenines.eu>
 %%
 %% Permission to use, copy, modify, and/or distribute this software for any
 %% purpose with or without fee is hereby granted, provided that the above
@@ -50,6 +50,17 @@
 
 -export([behaviour_info/1]).
 
+%%-type opts() :: any().
+%%-type state() :: any().
+%%-type terminate_reason() :: {normal, shutdown}
+%%	| {normal, timeout}
+%%	| {error, closed}
+%%	| {remote, closed}
+%%	| {remote, cowboy_websocket:close_code(), binary()}
+%%	| {error, badencoding}
+%%	| {error, badframe}
+%%	| {error, atom()}.
+
 
 % -type opts() :: any().
 % -type state() :: any().
@@ -69,7 +80,7 @@ behaviour_info(callbacks) ->
 % 	| {ok, Req, state(), timeout(), hibernate}
 % 	| {shutdown, Req}
 % 	when Req::cowboy_req:req().
-{websocket_handle, 2},
+{websocket_handle, 3},
 % -callback websocket_handle({text | binary | ping | pong, binary()}, Req, State)
 % 	-> {ok, Req, State}
 % 	| {ok, Req, State, hibernate}
